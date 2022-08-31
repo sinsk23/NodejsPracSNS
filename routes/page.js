@@ -1,6 +1,7 @@
 const express = require("express");
 //로그인 검사 미들웨어
 const { isLoggedIn, isNotLoggedIn } = require("./middlewares");
+const { Post, User } = require("../models");
 
 const router = express.Router();
 
@@ -22,12 +23,25 @@ router.get("/join", isNotLoggedIn, (req, res) => {
 
 //로그인
 router.get("/", (req, res, next) => {
-  res.render("main", {
-    title: "NodeBird",
-    twits: [],
-    user: null,
-    loginError: req.flash("loginError"), //에러메세지를 보여주기위한 flash 메세지
-  });
+  Post.findAll({
+    include: {
+      model: User,
+      attributes: ["id", "nick"],
+    },
+    order: [["createdAt", "DESC"]],
+  })
+    .then((posts) => {
+      res.render("main", {
+        title: "NodeBird",
+        twits: posts,
+        user: req.user,
+        loginError: req.flash("loginError"),
+      });
+    })
+    .catch((error) => {
+      console.error(error);
+      next(error);
+    });
 });
 
 module.exports = router;

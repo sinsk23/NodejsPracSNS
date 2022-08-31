@@ -4,7 +4,7 @@ module.exports = (sequelize, DataTypes) =>
     {
       email: {
         type: DataTypes.STRING(40),
-        allowNull: false,
+        allowNull: true, //카카오 정책 변경으로 인한 false->true로 변경
         unique: true,
       },
       nick: {

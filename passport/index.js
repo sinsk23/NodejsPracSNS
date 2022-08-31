@@ -19,9 +19,21 @@ module.exports = (passport) => {
 
   passport.deserializeUser((id, done) => {
     //user.id -> id
-    User.findOne({ where: { id } })
-      .then((user) => done(null, user)) //req.user에 저장 함으로 앞으로 req.user를 통해 로그인한 사용자 정보를 가져올 수 있음
-      .catch((err) => done(err));
+    User.findOne({
+      where: { id },
+      include: [
+        {
+          model: User,
+          attributes: ["id", "nick"],
+          as: "Followers",
+        },
+        {
+          model: User,
+          attributes: ["id", "nick"],
+          as: "Followings",
+        },
+      ],
+    });
   });
   local(passport);
   kakao(passport);

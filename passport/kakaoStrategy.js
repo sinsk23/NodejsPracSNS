@@ -6,7 +6,7 @@ module.exports = (passport) => {
     new KakaoStrategy(
       {
         clientID: process.env.KAKAO_ID,
-        callbackURL: "auth/kakao/callback",
+        callbackURL: "/auth/kakao/callback",
         //먼저 기존에 카카오로 로그인한 사용자가 있는지 조회
       },
       async (accessToken, refreshToken, profile, done) => {

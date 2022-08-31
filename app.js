@@ -6,19 +6,31 @@ const morgan = require("morgan");
 const path = require("path");
 const session = require("express-session");
 const flash = require("connect-flash");
-const pageRouter = require("./routes/page");
+const pageRouter = require("./routes/page.js");
+const authRouter = require("./routes/auth.js");
+const postRouter = require("./routes/post.js");
+const userRouter = require("./routes/user.js");
+
 const { sequelize } = require("./models");
-const authRouter = require("./routes/auth");
+
 const passportConfig = require("./passport");
 
 const app = express();
-sequelize.sync();
+sequelize
+  .sync({ force: false })
+  .then(() => {
+    console.log("데이터베이스 연결 성공");
+  })
+  .catch((err) => {
+    console.log(err);
+  });
 passportConfig(passport);
 
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "pug");
 app.set("port", process.env.PORT || 8001);
 app.use(morgan("dev"));
+app.use("/img", express.static(path.join(__dirname, "uploads")));
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -42,6 +54,8 @@ app.use(passport.session()); //passport.session() 미들웨어는 req.session �
 //req.session 객체는 express-session에서 생성하는 것이므로 passport 미들웨어는express-session 미들웨어보다 뒤에 연결
 app.use("/", pageRouter);
 app.use("/auth", authRouter);
+app.use("/post", postRouter);
+app.use("/user", userRouter);
 
 //404 미들웨어
 app.use((req, res, next) => {
